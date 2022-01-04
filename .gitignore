@@ -1,5 +1,7 @@
 
 *.user
+.DS_Store
+.vscode
 
 source/iwad/doom2.h
 

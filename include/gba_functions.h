@@ -5,20 +5,27 @@
 #include "doomtype.h"
 #include "m_fixed.h"
 
+#ifdef RP2040
+#include "hardware/divider.h"
+#else
 #ifdef GBA
     #include <gba_systemcalls.h>
     #include <gba_dma.h>
 #endif
-
+#endif
 
 inline static CONSTFUNC int IDiv32 (int a, int b)
 {
 
+#ifdef RP2040
+    return hw_divider_quotient_s32 (a, b);
+#else
     //use bios divide on gba.
 #ifdef GBA
     return Div(a, b);
 #else
     return a / b;
+#endif
 #endif
 }
 

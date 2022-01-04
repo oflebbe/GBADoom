@@ -66,6 +66,9 @@
 #include "global_data.h"
 
 #include "gba_functions.h"
+#ifdef RP2040
+#include "hardware/timer.h"
+#endif
 
 
 //#define static
@@ -3293,26 +3296,29 @@ void P_RunThinkers (void)
 }
 
 
-
+#ifdef GBA
 static int I_GetTime_e32(void)
 {
     int thistimereply = *((unsigned short*)(0x400010C));
 
     return thistimereply;
 }
-
+#endif
 
 int I_GetTime(void)
 {
     int thistimereply;
 
+#ifdef RP2040
+    thistimereply = (time_us_64() * TICRATE) / 1000000;
+#else
 #ifndef GBA
-
     clock_t now = clock();
 
     thistimereply = (int)((double)now / ((double)CLOCKS_PER_SEC / (double)TICRATE));
 #else
     thistimereply = I_GetTime_e32();
+#endif
 #endif
 
     if (thistimereply < _g->lasttimereply)

@@ -60,6 +60,9 @@
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
+#ifdef RP2040
+#include "pico/stdlib.h"
+#endif
 
 /* Most of the following has been rewritten by Lee Killough
  *
@@ -82,6 +85,10 @@ static void PrintVer(void)
 
 int main(int argc, const char * const * argv)
 {
+#ifdef RP2040
+    stdio_init_all();
+    sleep_ms(2000);
+#endif
     /* cphipps - call to video specific startup code */
     I_PreInitGraphics();
 
