@@ -66,13 +66,14 @@ p_lights.c
 p_enemy.c
 m_random.c
 i_system_sparkfun_thingplus.c
+st7789.c
 )
 
 
 # PICO DOOM leave out all windows/mac specific stuff 
 add_executable(pico_doom ${SOURCES})
 target_include_directories(pico_doom PRIVATE ../include)
-target_link_libraries(pico_doom pico_stdlib hardware_divider)
+target_link_libraries(pico_doom pico_stdlib hardware_divider hardware_spi)
 pico_set_linker_script( pico_doom ${CMAKE_SOURCE_DIR}/source/sparkfun-thingplus.ld)
 pico_enable_stdio_usb(pico_doom 1)
 pico_enable_stdio_uart(pico_doom 0)
