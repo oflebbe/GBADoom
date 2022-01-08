@@ -38,18 +38,6 @@ void I_InitScreen_e32() {}
 
 //**************************************************************************************
 
-void I_BlitScreenBmp_e32() {}
-
-//**************************************************************************************
-
-void I_StartWServEvents_e32() {}
-
-//**************************************************************************************
-
-void I_PollWServEvents_e32() {}
-
-//**************************************************************************************
-
 void I_ClearWindow_e32() {}
 
 //**************************************************************************************
@@ -139,7 +127,80 @@ int I_GetVideoHeight_e32() { return 160; }
 
 //**************************************************************************************
 
-void I_ProcessKeyEvents() {}
+static bool init_gpio = false;
+static int8_t scan_list[] = { 16, 26,27,28,29};
+static int8_t keyd_list_line1[] = { KEYD_SELECT, KEYD_UP, KEYD_RIGHT, KEYD_DOWN, KEYD_LEFT};
+static int8_t keyd_list_line2[] = { KEYD_START, KEYD_A, KEYD_R, KEYD_B, KEYD_L};
+static int8_t pressed_line1[] = { 0, 0, 0, 0, 0};
+static int8_t pressed_line2[] = { 0, 0, 0, 0, 0};
+
+
+void I_ProcessKeyEvents() {
+  if (!init_gpio) {
+    init_gpio = true;
+    // two output lines
+    gpio_init(18);
+    gpio_init(17);
+    gpio_set_dir(18, GPIO_OUT);
+    gpio_set_dir(17, GPIO_OUT);
+
+    // 4 + 1input lines, pulled down
+    for (int i = 0; i < sizeof( scan_list); i++ ) {
+      int pin = scan_list[i];      gpio_init( pin);
+      gpio_set_dir(pin, GPIO_IN);
+        // pull down
+      gpio_set_pulls( pin, 0, 1);
+    }
+  }
+
+  event_t ev= {0,0,0,0};
+  gpio_put( 18, 1);
+  gpio_put( 17, 0);
+  
+  for (int i = 0; i < sizeof( scan_list); i++ ) {
+      int pin = scan_list[i];
+      bool status = gpio_get( pin); 
+      if (status) {
+        if (!pressed_line1[i]) {
+          pressed_line1[i] = 1;
+          ev.type = ev_keydown;
+          ev.data1 = keyd_list_line1[i];
+          D_PostEvent(&ev);
+        }
+      } else {
+        if (pressed_line1[i]) {
+          pressed_line1[i] = 0;
+          ev.type = ev_keyup;
+          ev.data1 = keyd_list_line1[i];
+          D_PostEvent(&ev);
+      }
+    }
+  }
+  gpio_put( 18, 0);
+  gpio_put( 17, 1);
+  for (int i = 0; i < sizeof( scan_list); i++ ) {
+      int pin = scan_list[i];
+      bool status = gpio_get( pin); 
+      if (status) {
+        if (!pressed_line2[i]) {
+          pressed_line2[i] = 1;
+          ev.type = ev_keydown;
+          ev.data1 = keyd_list_line2[i];
+          D_PostEvent(&ev);
+        }
+      } else {
+        if (pressed_line2[i]) {
+          pressed_line2[i] = 0;
+          ev.type = ev_keyup;
+          ev.data1 = keyd_list_line2[i];
+          D_PostEvent(&ev);
+      }
+    }
+  }
+  gpio_put( 18, 0);
+  gpio_put( 17, 0);
+}
+
 
 //**************************************************************************************
 
