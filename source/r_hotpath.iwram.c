@@ -104,6 +104,7 @@ short* ceilingclip = (short*)&vram3_spare[512+240];
 
 
 
+#ifdef GBA
 //Stuff alloc'd in VRAM1 memory.
 
 //580 bytes
@@ -114,6 +115,7 @@ const fixed_t* distscale_vram = (const fixed_t*)&vram1_spare[580];
 
 //484 bytes.
 const angle_t* xtoviewangle_vram = (const angle_t*)&vram1_spare[580+480];
+#endif
 
 //240 Bytes.
 short* wipe_y_lookup = (short*)&vram1_spare[580+480+484];
@@ -132,10 +134,11 @@ short* screenheightarray = (short*)&vram2_spare[0];
 //240 bytes
 short* negonearray = (short*)&vram2_spare[240];
 
-
+#ifdef GBA
 #define yslope yslope_vram
 #define distscale distscale_vram
 #define xtoviewangle xtoviewangle_vram
+#endif
 
 //*****************************************
 //Column cache stuff.

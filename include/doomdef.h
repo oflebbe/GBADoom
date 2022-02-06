@@ -114,7 +114,7 @@ typedef enum {
 
 // SCREENWIDTH and SCREENHEIGHT define the visible size
 #define SCREENWIDTH 120
-#define SCREENHEIGHT 160
+#define SCREENHEIGHT MAX_SCREENHEIGHT
 #define SCREENPITCH SCREENWIDTH //In shorts.
 // SCREENPITCH is the size of one line in the buffer and
 // can be bigger than the SCREENWIDTH depending on the size

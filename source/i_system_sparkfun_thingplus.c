@@ -108,7 +108,7 @@ void I_FinishUpdate_e32(const byte *srcBuffer, const byte *pallete,
         *st_ptr++ = pal_ram[*srcBuffer++];
     }
      ST7789_blit_buffer(sobj, (char *) st_buffer, MAX_SCREENWIDTH*4, 0,
-                     (240 - 160) / 2 + j, width*2, 1, 0);
+                     (240 - MAX_SCREENWIDTH)/2 + j, width*2, 1, 0);
   }
 }
 
@@ -116,14 +116,6 @@ void I_FinishUpdate_e32(const byte *srcBuffer, const byte *pallete,
 
 void I_SetPallete_e32(const byte *pallete) {
 }
-
-//**************************************************************************************
-
-int I_GetVideoWidth_e32() { return 120; }
-
-//**************************************************************************************
-
-int I_GetVideoHeight_e32() { return 160; }
 
 //**************************************************************************************
 

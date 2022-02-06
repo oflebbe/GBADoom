@@ -47,7 +47,7 @@
 
 #define LOWERSPEED   (FRACUNIT*6)
 #define RAISESPEED   (FRACUNIT*6)
-#define WEAPONBOTTOM (FRACUNIT*128)
+#define WEAPONBOTTOM (FRACUNIT*(240-32))
 #define WEAPONTOP    (FRACUNIT*32)
 
 #define BFGCELLS bfgcells        /* Ty 03/09/98 externalized in p_inter.c */
