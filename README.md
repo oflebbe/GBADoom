@@ -1,3 +1,49 @@
+# PicoDoom, a fork of GBA Doom
+
+![PicoDoom](PicoDoom.png)
+
+## Hardware
+
+- [Sparkfun Thinkplus - rp2040](https://www.sparkfun.com/products/17745) Raspberry Pico Board has too little Flash
+- [ST7789 OLED Display](https://www.waveshare.com/product/displays/lcd-oled/lcd-oled-3/1.3inch-lcd-module.htm) Any ST7789 240x240 Display should work
+- 10 Buttons
+
+## Wiring
+
+ST7789 <-> SparkFun
+- VCC to 3.3V
+- GND to GND
+- DIN to 4/COPI (Computer Out Peripheral In)
+- CLK to 5/SCK
+- CS to 29/ADC3 (not needed if ST778 doesn't have a CS)
+- DC to 28/ADC2
+- RST to 27/ADC1
+- BL to 26/ADC0
+
+Buttons are arranged as a matrix of 2 rows AND 5 colums
+- Row 0-1 to Pin 16 - 17
+- Columns 0 - 4 to Pin 18 - Pin 22 
+
+Debug Output as Serial on USB
+
+## Building
+
+Requirements [Pico SDK](https://www.raspberrypi.com/documentation/microcontrollers/c_sdk.html)
+
+```
+git clone https://github.com/oflebbe/GBADoom
+cd GBADoom
+mkdir build
+cd build
+cmake -GNinja  ..
+ninja
+```
+
+## Acknowledgements
+- [GBADoom Team](https://github.com/doomhack/GBADoom)
+- Ivan Belokobylskiy for the fast [st7789_mpy Driver](https://github.com/devbis/st7789_mpy)
+
+
 ## GBADoom
 
 A port of prBoom to the GBA.

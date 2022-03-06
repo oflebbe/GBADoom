@@ -78,7 +78,7 @@ void ST7789_fill_rect(ST7789_t *self, uint8_t x, uint8_t y, uint8_t w, uint8_t h
 void ST7789_line(ST7789_t *self, int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t color);
 void ST7789_blit_buffer(ST7789_t *self, const uint8_t* buf, int buf_len, int16_t x, int16_t y, int16_t w, int16_t h, int16_t color);
 void ST7789_init(ST7789_t *self);
-ST7789_t *ST7789_create( spi_inst_t *spi_obj, int16_t width, int16_t height, uint8_t reset, uint8_t dc, uint8_t backlight);
+ST7789_t *ST7789_create( spi_inst_t *spi_obj, int16_t width, int16_t height, uint8_t cs, uint8_t reset, uint8_t dc, uint8_t backlight);
 void ST7789_on(ST7789_t *self);
 void ST7789_off(ST7789_t *self);
 #ifdef  __cplusplus

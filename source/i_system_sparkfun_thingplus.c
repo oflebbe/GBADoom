@@ -34,7 +34,30 @@
 
 //**************************************************************************************
 
-void I_InitScreen_e32() {}
+
+static int8_t scan_list[] = { 22, 21, 20, 19, 18};
+static int8_t keyd_list_line1[] = { KEYD_SELECT, KEYD_UP, KEYD_RIGHT, KEYD_DOWN, KEYD_LEFT};
+static int8_t keyd_list_line2[] = { KEYD_START, KEYD_A, KEYD_R, KEYD_B, KEYD_L};
+static int8_t pressed_line1[] = { 0, 0, 0, 0, 0};
+static int8_t pressed_line2[] = { 0, 0, 0, 0, 0};
+
+
+void I_InitScreen_e32() {
+    // two scan lines
+    gpio_init(17);
+    gpio_init(16);
+    gpio_set_dir(17, GPIO_OUT);
+    gpio_set_dir(16, GPIO_OUT);
+
+    // 4 + 1input lines, pulled down
+    for (int i = 0; i < sizeof( scan_list); i++ ) {
+      int pin = scan_list[i];
+      gpio_init( pin);
+      gpio_set_dir(pin, GPIO_IN);
+      // pull down
+      gpio_set_pulls( pin, 0, 1);
+    }
+}
 
 //**************************************************************************************
 
@@ -62,21 +85,25 @@ void I_CreateWindow_e32() {
   gpio_set_function(PICO_DEFAULT_SPI_RX_PIN, GPIO_FUNC_SPI);
   gpio_set_function(PICO_DEFAULT_SPI_SCK_PIN, GPIO_FUNC_SPI);
   gpio_set_function(PICO_DEFAULT_SPI_TX_PIN, GPIO_FUNC_SPI);
-  // gpio_set_function(1, GPIO_FUNC_SPI);
 
-  // CS 19
-  gpio_init(19);
-  gpio_set_dir(19, GPIO_OUT);
+  // CS 29
+  gpio_init(29);
+  gpio_set_dir(29, GPIO_OUT);
 
-  gpio_init(20);
-  gpio_set_dir(20, GPIO_OUT);
-  gpio_init(21);
-  gpio_set_dir(21, GPIO_OUT);
-  gpio_init(22);
-  gpio_set_dir(22, GPIO_OUT);
+  // DC 28
+  gpio_init(28);
+  gpio_set_dir(28, GPIO_OUT);
+
+  // RST 27
+  gpio_init(27);
+  gpio_set_dir(27, GPIO_OUT);
+  
+  // BL 26
+  gpio_init(26);
+  gpio_set_dir(26, GPIO_OUT);
   spi_set_format(spi0, 8, SPI_CPOL_1, SPI_CPHA_0, SPI_MSB_FIRST);
 
-  sobj = ST7789_create(spi0, 240, 240, 22, 21, 20);
+  sobj = ST7789_create(spi0, 240, 240, 29, 27, 28, 26);
   ST7789_init(sobj);
   ST7789_on(sobj);
 }
@@ -119,36 +146,13 @@ void I_SetPallete_e32(const byte *pallete) {
 
 //**************************************************************************************
 
-static bool init_gpio = false;
-static int8_t scan_list[] = { 16, 26,27,28,29};
-static int8_t keyd_list_line1[] = { KEYD_SELECT, KEYD_UP, KEYD_RIGHT, KEYD_DOWN, KEYD_LEFT};
-static int8_t keyd_list_line2[] = { KEYD_START, KEYD_A, KEYD_R, KEYD_B, KEYD_L};
-static int8_t pressed_line1[] = { 0, 0, 0, 0, 0};
-static int8_t pressed_line2[] = { 0, 0, 0, 0, 0};
 
 
 void I_ProcessKeyEvents() {
-  if (!init_gpio) {
-    init_gpio = true;
-    // two output lines
-    gpio_init(18);
-    gpio_init(17);
-    gpio_set_dir(18, GPIO_OUT);
-    gpio_set_dir(17, GPIO_OUT);
-
-    // 4 + 1input lines, pulled down
-    for (int i = 0; i < sizeof( scan_list); i++ ) {
-      int pin = scan_list[i];      gpio_init( pin);
-      gpio_set_dir(pin, GPIO_IN);
-        // pull down
-      gpio_set_pulls( pin, 0, 1);
-    }
-  }
 
   event_t ev= {0,0,0,0};
-  gpio_put( 18, 1);
-  gpio_put( 17, 0);
-  
+  gpio_put( 16, 1);
+  sleep_us(1); // wait for gpio changes to get into effect
   for (int i = 0; i < sizeof( scan_list); i++ ) {
       int pin = scan_list[i];
       bool status = gpio_get( pin); 
@@ -168,8 +172,9 @@ void I_ProcessKeyEvents() {
       }
     }
   }
-  gpio_put( 18, 0);
   gpio_put( 17, 1);
+  gpio_put( 16, 0);
+  sleep_us(1); // wait for gpio changes to get into effect
   for (int i = 0; i < sizeof( scan_list); i++ ) {
       int pin = scan_list[i];
       bool status = gpio_get( pin); 
@@ -189,7 +194,6 @@ void I_ProcessKeyEvents() {
       }
     }
   }
-  gpio_put( 18, 0);
   gpio_put( 17, 0);
 }
 

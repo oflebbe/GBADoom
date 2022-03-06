@@ -161,20 +161,6 @@ static void ST7789_soft_reset(ST7789_t *self) {
     sleep_ms(150);
 }
 
-/*
-static mp_obj_t ST7789_sleep_mode(mp_obj_t self_in, mp_obj_t value) {
-    ST7789_t *self = MP_OBJ_TO_PTR(self_in);
-    if(mp_obj_is_true(value)) {
-        write_cmd(self, ST7789_SLPIN, NULL, 0);
-    } else {
-        write_cmd(self, ST7789_SLPOUT, NULL, 0);
-    }
-    return mp_const_none;
-}
-MP_DEFINE_CONST_FUN_OBJ_2(ST7789_sleep_mode_obj, ST7789_sleep_mode);
-
-*/
-
 static void ST7789_inversion_mode(ST7789_t *self, bool value) {
     if(value) {
         write_cmd(self, ST7789_INVON, NULL, 0);
@@ -286,28 +272,9 @@ void ST7789_off(ST7789_t *self) {
     sleep_ms(10);
 }
 
-
-/*
-static mp_obj_t ST7789_rect(size_t n_args, const mp_obj_t *args) {
-    ST7789_t *self = MP_OBJ_TO_PTR(args[0]);
-    mp_int_t x = mp_obj_get_int(args[1]);
-    mp_int_t y = mp_obj_get_int(args[2]);
-    mp_int_t w = mp_obj_get_int(args[3]);
-    mp_int_t h = mp_obj_get_int(args[4]);
-    mp_int_t color = mp_obj_get_int(args[5]);
-
-    ST7789_hline(self, x, y, w, color);
-    ST7789_vline(self, x, y, h, color);
-    ST7789_hline(self, x, y + h - 1, w, color);
-    ST7789_vline(self, x + w - 1, y, h, color);
-    return mp_const_none;
-}
-static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(ST7789_rect_obj, 6, 6, ST7789_rect);
-*/
-
 static struct _ST7789_t  st7789;
 
-ST7789_t *ST7789_create(spi_inst_t *spi_obj, int16_t width, int16_t height, uint8_t reset, uint8_t dc, uint8_t backlight) {
+ST7789_t *ST7789_create(spi_inst_t *spi_obj, int16_t width, int16_t height, uint8_t cs, uint8_t reset, uint8_t dc, uint8_t backlight) {
     // YUCK
     ST7789_t *self = &st7789;
     self->spi_obj = spi_obj;
@@ -326,8 +293,7 @@ ST7789_t *ST7789_create(spi_inst_t *spi_obj, int16_t width, int16_t height, uint
 
     self->reset = reset;
     self->dc = dc;
-    // YUCK
-    self->cs = 19;
+    self->cs = cs;
     self->backlight = backlight;
     return self;
 }
