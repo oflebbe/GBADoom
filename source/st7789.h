@@ -34,7 +34,7 @@ extern "C" {
 #define ST7789_INVON   0x21
 #define ST7789_DISPOFF 0x28
 #define ST7789_DISPON  0x29
-#define ST7789_CASET   0x2A
+#define ST7789_CASET   0x2A 
 #define ST7789_RASET   0x2B
 #define ST7789_RAMWR   0x2C
 #define ST7789_RAMRD   0x2E
@@ -42,6 +42,22 @@ extern "C" {
 #define ST7789_PTLAR   0x30
 #define ST7789_COLMOD  0x3A
 #define ST7789_MADCTL  0x36
+
+// shamelessly copied from piromoni 
+#define ST7789_TEON 0x35
+#define ST7789_PORCTRL 0xB2
+#define ST7789_LCMCTRL 0xC0
+#define ST7789_VDVVRHEN 0xC2
+#define ST7789_VRHS 0xC3
+#define ST7789_VDVS 0xC4
+#define ST7789_PWCTRL1 0xD0
+#define ST7789_FRCTRL2 0xC6
+#define ST7789_GCTRL 0xB7
+#define ST7789_VCOMS 0xBB
+#define ST7789_GMCTRP1 0xE0
+#define ST7789_GMCTRN1 0xE1
+
+
 
 #define ST7789_MADCTL_MY  0x80  // Page Address Order
 #define ST7789_MADCTL_MX  0x40  // Column Address Order
@@ -68,19 +84,17 @@ extern "C" {
 
 #include <hardware/spi.h>
 
-
-typedef uint hal_pin_t;
 typedef struct _ST7789_t ST7789_t;
-void ST7789_draw_pixel(ST7789_t *self, uint8_t x, uint8_t y, uint16_t color);
-void ST7789_hline(ST7789_t *self, uint8_t x, uint8_t y, uint16_t w, uint16_t color);
-void ST7789_vline(ST7789_t *self, uint8_t x, uint8_t y, uint16_t w, uint16_t color);
-void ST7789_fill_rect(ST7789_t *self, uint8_t x, uint8_t y, uint8_t w, uint8_t h, int16_t color);
-void ST7789_line(ST7789_t *self, int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t color);
-void ST7789_blit_buffer(ST7789_t *self, const uint8_t* buf, int buf_len, int16_t x, int16_t y, int16_t w, int16_t h, int16_t color);
-void ST7789_init(ST7789_t *self);
-ST7789_t *ST7789_create( spi_inst_t *spi_obj, int16_t width, int16_t height, uint8_t cs, uint8_t reset, uint8_t dc, uint8_t backlight);
-void ST7789_on(ST7789_t *self);
-void ST7789_off(ST7789_t *self);
+
+void ST7789_update(ST7789_t *self, const uint8_t* buf, size_t buf_len);
+
+ST7789_t *ST7789_spi_create( spi_inst_t *spi_obj, int16_t width, int16_t height, uint cs, uint reset, uint dc, uint backlight, uint tx, uint sck);
+ST7789_t *ST7789_parallel_create( int16_t width, int16_t height, uint cs, uint dc, uint backlight, uint wr, uint rd, uint d0);
+void ST7789_blit_buffer(ST7789_t *self, const uint8_t *buf, size_t buf_len,
+                        int16_t x, int16_t y, int16_t w, int16_t h);
+void ST7789_backlight(ST7789_t *self, uint8_t bl);
+
+
 #ifdef  __cplusplus
 }
 #endif /*  __cplusplus */

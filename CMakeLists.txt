@@ -14,8 +14,10 @@ project("Pico_Doom"
 
 pico_sdk_init()
 
-add_definitions(-DRP2040)
+add_definitions(-DRP2040 )
 add_definitions(-DPICO_MALLOC_PANIC=0)
+add_definitions(-DSMALL_SPI=1)
+
 set(PACKAGE_NAME "${PROJECT_NAME}")
 
 set(CMAKE_CROSSCOMPILING ON)
