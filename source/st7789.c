@@ -68,10 +68,12 @@ static void write_blocking_dma(ST7789_t *self, const uint8_t *src, size_t len) {
   dma_channel_set_read_addr(self->st_dma, src, true);
 
   dma_channel_wait_for_finish_blocking(self->st_dma);
+
+  sleep_us(1); // We shouldn't overrun the ST7789
 }
 
 static void write_blocking(ST7789_t *self, const uint8_t *src, size_t len) {
-  if (len > 100000) {
+  if (len > 100) {
     write_blocking_dma(self, src, len);
     return;
   }
@@ -134,7 +136,6 @@ void ST7789_backlight(ST7789_t *self, uint8_t brightness) {
   pwm_set_gpio_level(self->backlight, value);
 }
 
-
 void ST7789_blit_buffer(ST7789_t *self, const uint8_t *buf, size_t buf_len,
                         int16_t x, int16_t y, int16_t w, int16_t h) {
   set_window(self, x, y, x + w - 1, y + h - 1);
@@ -189,13 +190,12 @@ ST7789_t *ST7789_spi_create(spi_inst_t *spi_obj, int16_t width, int16_t height,
   self->st_dma = dma_claim_unused_channel(true);
   dma_channel_config dma_config = dma_channel_get_default_config(self->st_dma);
   channel_config_set_transfer_data_size(&dma_config, DMA_SIZE_8);
-  channel_config_set_write_increment(&dma_config, false);
-  channel_config_set_read_increment(&dma_config, true); 
+  channel_config_set_irq_quiet(&dma_config, true);
 
   channel_config_set_dreq(&dma_config, spi_get_dreq(self->spi_obj, true));
   dma_channel_set_config(self->st_dma, &dma_config, false);
-  dma_channel_set_write_addr(self->st_dma, &spi_get_hw(self->spi_obj)->dr, false);
-
+  dma_channel_set_write_addr(self->st_dma, &spi_get_hw(self->spi_obj)->dr,
+                             false);
 
   ST7789_hard_reset(self);
   ST7789_soft_reset(self);
@@ -210,9 +210,9 @@ ST7789_t *ST7789_spi_create(spi_inst_t *spi_obj, int16_t width, int16_t height,
   write_cmd(self, ST7789_INVON, NULL, 0);
   sleep_ms(10);
   write_cmd(self, ST7789_NORON, NULL, 0);
-sleep_ms(10);
+  sleep_ms(10);
   write_cmd(self, ST7789_DISPON, NULL, 0);
-sleep_ms(100);
+  sleep_ms(100);
   return self;
 }
 #else
@@ -293,7 +293,7 @@ ST7789_t *ST7789_parallel_create(int16_t width, int16_t height, uint cs,
   dma_channel_config dma_config = dma_channel_get_default_config(self->st_dma);
   channel_config_set_transfer_data_size(&dma_config, DMA_SIZE_8);
   channel_config_set_write_increment(&dma_config, false);
-  channel_config_set_read_increment(&dma_config, true); 
+  channel_config_set_read_increment(&dma_config, true);
   channel_config_set_bswap(&dma_config, false);
 
   channel_config_set_dreq(
@@ -312,8 +312,8 @@ ST7789_t *ST7789_parallel_create(int16_t width, int16_t height, uint cs,
   write_cmd(self, ST7789_SLPOUT, NULL, 0); // leave sleep mode
   write_cmd(self, ST7789_DISPON, NULL, 0); // turn display on
 
-  const uint8_t madctl[] = { ST7789_MADCTL_MY | ST7789_MADCTL_MV |
-                             ST7789_MADCTL_RGB};
+  const uint8_t madctl[] = {ST7789_MADCTL_MY | ST7789_MADCTL_MV |
+                            ST7789_MADCTL_RGB};
   write_cmd(self, ST7789_MADCTL, madctl, 1);
 
   return self;
